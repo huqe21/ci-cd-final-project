@@ -16,7 +16,7 @@ spec:
       description: Application name
     - name: build-image
       type: string
-      description: The image to build and deploy
+      description: The image to build
 
   workspaces:
     - name: output
@@ -75,13 +75,12 @@ spec:
         - name: source
           workspace: output
 
-    # - name: deploy
-    #   taskRef:
-    #     name: openshift-client
-    #     kind: ClusterTask
-    #   runAfter:
-    #     - buildah
-    #   params:
-    #     - name: SCRIPT
-    #       value: |
-    #         oc create deployment $(params.app-name) --image=$(params.build-image) --dry-run=client -o yaml | oc apply -f -
+    - name: deploy
+      taskRef:
+        name: openshift-client
+        kind: ClusterTask
+      runAfter:
+        - buildah
+      params:
+        - name: SCRIPT
+          value: oc create deployment $(params.app-name) --image=$(params.build-image) --dry-run=client -o yaml | oc apply -f -
